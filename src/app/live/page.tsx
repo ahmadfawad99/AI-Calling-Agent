@@ -350,7 +350,7 @@ export default function LivePanelPage() {
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder={isRecording ? "Listening..." : "Or type your reply..."}
+                  placeholder={isListening ? "Listening..." : "Or type your reply..."}
                   className="flex-1 bg-neutral-900 border border-neutral-800 rounded-full px-5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
                 />
                 <button type="submit" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors">
