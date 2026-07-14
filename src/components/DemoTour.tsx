@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CallBackProps, STATUS, Step } from "react-joyride";
+import { STATUS, Step } from "react-joyride";
 import dynamic from "next/dynamic";
 
 const Joyride = dynamic(
@@ -53,7 +53,7 @@ export default function DemoTour() {
     },
   ];
 
-  const handleJoyrideCallback = (data: CallBackProps) => {
+  const handleJoyrideCallback = (data: any) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
     
