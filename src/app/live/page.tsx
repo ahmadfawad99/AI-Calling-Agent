@@ -1,31 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function LivePanelPage() {
   const [callActive, setCallActive] = useState(false);
   const [transcript, setTranscript] = useState<{speaker: string, text: string}[]>([]);
+  const [userInput, setUserInput] = useState("");
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
 
-  // Simulate a call transcript over time and speak agent's lines
+  const speak = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.lang === "en-US");
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Simulate initial call flow
   useEffect(() => {
     if (!callActive) {
       window.speechSynthesis.cancel();
       return;
     }
     
-    const speak = (text: string) => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      // Try to find a good English voice
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.lang === "en-US");
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    };
-
     setTranscript([{ speaker: "System", text: "Connecting to agent..." }]);
     
     let timer1 = setTimeout(() => {
@@ -52,6 +53,11 @@ export default function LivePanelPage() {
     };
   }, [callActive]);
 
+  // Auto-scroll transcript
+  useEffect(() => {
+    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [transcript]);
+
   const toggleCall = () => {
     if (callActive) {
       setCallActive(false);
@@ -59,6 +65,21 @@ export default function LivePanelPage() {
     } else {
       setCallActive(true);
     }
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userInput.trim() || !callActive) return;
+
+    setTranscript(prev => [...prev, { speaker: "User", text: userInput }]);
+    setUserInput("");
+
+    // Simulate Agent processing the user's manual input
+    setTimeout(() => {
+      const text = "Perfect! I've scheduled your demo and sent a calendar invite. Is there anything else I can assist you with today?";
+      setTranscript(prev => [...prev, { speaker: "Agent", text }]);
+      speak(text);
+    }, 2000);
   };
 
   return (
@@ -108,32 +129,40 @@ export default function LivePanelPage() {
                 <p className="text-xs mt-2 text-neutral-600">Make sure your volume is turned up!</p>
               </div>
             ) : (
-              transcript.map((line, idx) => (
-                <div key={idx} className={`flex flex-col ${line.speaker === 'User' ? 'items-end' : 'items-start'}`}>
-                  <span className="text-xs text-neutral-500 mb-1 ml-1">{line.speaker}</span>
-                  <div className={`max-w-[80%] rounded-2xl px-5 py-3 ${
-                    line.speaker === 'System' ? 'bg-neutral-800/50 text-neutral-400 text-center w-full max-w-full rounded-lg' :
-                    line.speaker === 'User' ? 'bg-blue-600 text-white rounded-br-none' : 
-                    'bg-neutral-800 text-neutral-100 rounded-bl-none border border-neutral-700'
-                  }`}>
-                    {line.text}
+              <>
+                {transcript.map((line, idx) => (
+                  <div key={idx} className={`flex flex-col ${line.speaker === 'User' ? 'items-end' : 'items-start'}`}>
+                    <span className="text-xs text-neutral-500 mb-1 ml-1">{line.speaker}</span>
+                    <div className={`max-w-[80%] rounded-2xl px-5 py-3 ${
+                      line.speaker === 'System' ? 'bg-neutral-800/50 text-neutral-400 text-center w-full max-w-full rounded-lg' :
+                      line.speaker === 'User' ? 'bg-blue-600 text-white rounded-br-none' : 
+                      'bg-neutral-800 text-neutral-100 rounded-bl-none border border-neutral-700'
+                    }`}>
+                      {line.text}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                <div ref={transcriptEndRef} />
+              </>
             )}
           </div>
           
-          <div className="p-4 border-t border-neutral-800 bg-neutral-950 flex gap-4">
-            <button disabled={!callActive} className="p-3 bg-neutral-900 border border-neutral-800 hover:border-neutral-600 disabled:opacity-50 disabled:hover:border-neutral-800 rounded-full text-white transition-colors">
-              Mute
-            </button>
-            <div className="flex-1 bg-neutral-900 border border-neutral-800 rounded-full flex items-center px-4 relative overflow-hidden">
-              <div className={`absolute left-0 bottom-0 top-0 bg-blue-500/20 transition-all duration-100 ${callActive ? 'w-[45%]' : 'w-0'}`}></div>
-              <span className="text-sm text-neutral-500 relative z-10">
-                {callActive ? 'Agent is listening...' : 'Microphone inactive'}
-              </span>
+          {callActive && (
+            <div className="p-4 border-t border-neutral-800 bg-neutral-950">
+              <form onSubmit={handleSendMessage} className="flex gap-4">
+                <input
+                  type="text"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  placeholder="Type a response to the agent..."
+                  className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                />
+                <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
+                  Send
+                </button>
+              </form>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 h-fit">
