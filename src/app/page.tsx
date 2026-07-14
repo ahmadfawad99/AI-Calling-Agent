@@ -11,7 +11,7 @@ export default function Dashboard() {
           <h2 className="text-3xl font-bold text-white mb-2">Overview</h2>
           <p className="text-neutral-400">Welcome back, Lucas. Here's your AI agent activity.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="tour-quick-actions flex gap-4">
           <Link href="/scheduler" className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors border border-neutral-700">
             Schedule Campaign
           </Link>
@@ -22,7 +22,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="tour-stats grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <h3 className="text-neutral-400 text-sm font-medium mb-1">Active Calls</h3>
@@ -46,7 +46,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+      <div className="tour-activity bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
         <div className="p-6 border-b border-neutral-800 flex justify-between items-center">
           <h3 className="text-xl font-bold text-white">Recent Activity</h3>
           <Link href="/calls" className="text-sm text-blue-400 hover:text-blue-300">View all logs →</Link>

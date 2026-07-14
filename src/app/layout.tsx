@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import DemoTour from "@/components/DemoTour";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-neutral-950 text-neutral-50 h-screen flex overflow-hidden`}>
+        <DemoTour />
         {/* Sidebar */}
-        <aside className="w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col hidden md:flex">
+        <aside className="tour-sidebar w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col hidden md:flex">
           <div className="p-6">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
               Quantify
