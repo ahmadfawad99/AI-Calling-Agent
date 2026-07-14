@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Joyride, { CallBackProps, STATUS, Step } from "react-joyride";
+import { CallBackProps, STATUS, Step } from "react-joyride";
+import dynamic from "next/dynamic";
+
+const Joyride = dynamic(
+  () => import("react-joyride").then((mod) => mod.Joyride),
+  { ssr: false }
+);
 import { usePathname } from "next/navigation";
 
 export default function DemoTour() {
