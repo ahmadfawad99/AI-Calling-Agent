@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { STATUS, Step } from "react-joyride";
 import dynamic from "next/dynamic";
 
-const Joyride = dynamic(
-  () => import("react-joyride").then((mod) => mod.Joyride),
+const Joyride: any = dynamic(
+  () => import("react-joyride").then((mod) => mod.Joyride as any),
   { ssr: false }
 );
 import { usePathname } from "next/navigation";
@@ -71,7 +71,7 @@ export default function DemoTour() {
       showSkipButton
       showProgress
       callback={handleJoyrideCallback}
-      styles={{
+      styles={({
         options: {
           primaryColor: '#2563eb', // blue-600
           textColor: '#f5f5f5',
@@ -89,7 +89,7 @@ export default function DemoTour() {
         buttonSkip: {
           color: '#a3a3a3',
         },
-      }}
+      }) as any}
     />
   );
 }
