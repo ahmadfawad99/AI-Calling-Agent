@@ -6,6 +6,7 @@ export default function LivePanelPage() {
   const [callActive, setCallActive] = useState(false);
   const [transcript, setTranscript] = useState<{speaker: string, text: string}[]>([]);
   const [userInput, setUserInput] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
   const speak = (text: string) => {
@@ -18,6 +19,42 @@ export default function LivePanelPage() {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     window.speechSynthesis.speak(utterance);
+  };
+
+  const startRecording = () => {
+    // @ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice input. Please try Chrome.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let currentTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      setUserInput(currentTranscript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
   };
 
   // Simulate initial call flow
@@ -62,6 +99,8 @@ export default function LivePanelPage() {
     if (callActive) {
       setCallActive(false);
       setTranscript([]);
+      setUserInput("");
+      setIsRecording(false);
     } else {
       setCallActive(true);
     }
@@ -149,12 +188,28 @@ export default function LivePanelPage() {
           
           {callActive && (
             <div className="p-4 border-t border-neutral-800 bg-neutral-950">
-              <form onSubmit={handleSendMessage} className="flex gap-4">
+              <form onSubmit={handleSendMessage} className="flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={startRecording}
+                  className={`p-3 rounded-lg border transition-colors ${
+                    isRecording 
+                      ? 'bg-red-900/30 border-red-800/50 text-red-500 animate-pulse' 
+                      : 'bg-neutral-900 border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white'
+                  }`}
+                  title="Speak"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </button>
                 <input
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Type a response to the agent..."
+                  placeholder={isRecording ? "Listening..." : "Type or speak your response..."}
                   className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
                 />
                 <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
