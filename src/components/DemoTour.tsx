@@ -29,7 +29,6 @@ export default function DemoTour() {
       target: "body",
       content: "Welcome to Quantify! 🚀 Let's take a quick tour of your AI calling platform.",
       placement: "center",
-      disableBeacon: true,
     },
     {
       target: ".tour-stats",
